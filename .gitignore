@@ -1,0 +1,43 @@
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.temp
+
+# Ambiente local
+.env
+.env.local
+.env.*.local
+
+# Dependências do Node.js
+node_modules/
+package-lock.json
+yarn.lock
+
+# Arquivos compilados pelo TypeScript
+dist/
+build/
+
+# Jest
+coverage/
+jest-stare/
+__snapshots__/
+test-results.xml
+
+# IDEs e editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Outros arquivos gerados automaticamente
+npm-debug.log*
+yarn-error.log*
+
+# Pasta de relatórios personalizados
+reports/
