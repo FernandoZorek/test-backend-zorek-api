@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { MovieRepository } from '../repositories/movie.repository';
 import { ProducerService } from '../services/producer.service';
-import { IMovieRepository, Movie } from '../repositories/movie.repository.interface';
-import { Movie as MovieEntity } from '../models/movie.entity';
 
 /**
  * @swagger
@@ -48,23 +46,6 @@ import { Movie as MovieEntity } from '../models/movie.entity';
  *         description: Erro interno do servidor.
  */
 
-class MovieRepository implements IMovieRepository {
-  private repository = getRepository(MovieEntity);
-
-  public async findAll(): Promise<Movie[]> {
-    const movies = await this.repository.find();
-    return movies
-      .filter((movie) => movie.winner)
-      .flatMap((movie) =>
-        movie.producers
-          .split(/\s*,\s*|\s*and\s*/)
-          .map((producer) => ({
-            producer: producer.trim(),
-            year: movie.year,
-          }))
-      );
-  }
-}
 
 export const getProducerIntervalsController = async (_req: Request, res: Response) => {
   try {

@@ -1,27 +1,19 @@
-import { IMovieRepository, Movie } from '../repositories/movie.repository.interface';
+import { IMovieRepository } from '../repositories/movie.repository.interface';
 
 export class ProducerService {
-  private movieRepository: IMovieRepository;
-
-  constructor(movieRepository: IMovieRepository) {
-    this.movieRepository = movieRepository;
-  }
+  constructor(private movieRepository: IMovieRepository) {}
 
   public async getProducerIntervals() {
-    const movies = await this.movieRepository.findAll();
+    const rawData = await this.movieRepository.findAll();
 
-    if (movies.length === 0) {
-      return { min: [], max: [] };
-    }
-
-    const groupedByProducer = this.groupMoviesByProducer(movies);
+    const groupedByProducer = this.groupMoviesByProducer(rawData);
 
     const intervals = [];
     for (const [producer, wins] of Object.entries(groupedByProducer)) {
-      const sortedWins = wins.sort((a, b) => a.year - b.year);
+      const sortedWins = wins.sort((a, b) => a - b);
       for (let i = 1; i < sortedWins.length; i++) {
-        const previousWin = sortedWins[i - 1].year;
-        const followingWin = sortedWins[i].year;
+        const previousWin = sortedWins[i - 1];
+        const followingWin = sortedWins[i];
         const interval = followingWin - previousWin;
         intervals.push({ producer, interval, previousWin, followingWin });
       }
@@ -37,34 +29,19 @@ export class ProducerService {
     const minIntervals = intervals.filter((i) => i.interval === minIntervalValue);
     const maxIntervals = intervals.filter((i) => i.interval === maxIntervalValue);
 
-    const uniqueMin = this.removeDuplicates(minIntervals);
-    const uniqueMax = this.removeDuplicates(maxIntervals);
-
     return {
-      min: uniqueMin,
-      max: uniqueMax,
+      min: minIntervals,
+      max: maxIntervals,
     };
   }
 
-  private removeDuplicates(intervals: any[]) {
-    const seen = new Set();
-    return intervals.filter((interval) => {
-      const key = JSON.stringify(interval);
-      if (seen.has(key)) {
-        return false;
+  private groupMoviesByProducer(rawData: any[]): Record<string, number[]> {
+    const grouped: Record<string, number[]> = {};
+    rawData.forEach((row) => {
+      if (!grouped[row.producer]) {
+        grouped[row.producer] = [];
       }
-      seen.add(key);
-      return true;
-    });
-  }
-
-  private groupMoviesByProducer(movies: Movie[]) {
-    const grouped: Record<string, Movie[]> = {};
-    movies.forEach((movie) => {
-      if (!grouped[movie.producer]) {
-        grouped[movie.producer] = [];
-      }
-      grouped[movie.producer].push(movie);
+      grouped[row.producer].push(row.year);
     });
     return grouped;
   }

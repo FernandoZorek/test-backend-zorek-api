@@ -39,7 +39,7 @@ As variáveis de ambiente são usadas para configurar o comportamento da aplica�
 ```plaintext
 PORT=3000
 DB_TYPE=sqlite
-DB_DATABASE=./data/database.sqlite
+DB_DATABASE=:memory:
 DB_SYNCHRONIZE=true
 DB_LOGGING=false
 CSV_FILE_PATH='./data/movies.csv'
